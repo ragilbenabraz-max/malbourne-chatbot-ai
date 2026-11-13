@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Malbourne Coffee Co - Admin Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- LAYAR LOGIN -->
+  <div id="login-screen" class="login-overlay">
+    <div class="login-card">
+      <h2>Malbourne Coffee Co</h2>
+      <p>Masuk untuk mengelola chat & info kafe</p>
+      <form id="login-form">
+        <input type="text" id="login-user" placeholder="Username" required>
+        <input type="password" id="login-pass" placeholder="Password" required>
+        <button type="submit" class="btn-primary full-width">Masuk Dashboard</button>
+        <p id="login-error" class="error-text"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- DASHBOARD UTAMA -->
+  <div id="app-container" class="dashboard-container hidden">
+    <nav class="sidebar">
+      <div class="brand">
+        <h2>Malbourne Admin</h2>
+        <small>WhatsApp AI Assistant</small>
+      </div>
+      <ul class="nav-links">
+        <li class="active" id="nav-inbox">💬 Kotak Masuk Chat</li>
+        <li id="nav-menu">📋 Kelola Menu & Info</li>
+      </ul>
+      <button id="logout-btn" class="btn-logout">Keluar</button>
+    </nav>
+
+    <main class="main-content">
+      <!-- TAB 1: INBOX & BALAS MANUAL -->
+      <section id="section-inbox" class="content-section active">
+        <div class="inbox-layout">
+          <!-- Daftar Pelanggan -->
+          <div class="contact-list-panel">
+            <div class="panel-header">
+              <h4>Pelanggan Masuk</h4>
+            </div>
+            <div id="contact-list" class="contact-list">
+              <div class="empty-state">Memuat kontak...</div>
+            </div>
+          </div>
+
+          <!-- Ruang Obrolan -->
+          <div class="chat-panel">
+            <div class="chat-header">
+              <div>
+                <h3 id="active-phone-title">Pilih Pelanggan</h3>
+                <span id="ai-status-desc" class="status-sub">Klik nomor di kiri untuk melihat chat</span>
+              </div>
+              <button id="toggle-ai-btn" class="btn btn-active hidden">AI Aktif</button>
+            </div>
+
+            <div id="summary-banner" class="summary-banner hidden">
+              <strong>Ringkasan Pelanggan:</strong> <span id="summary-text">-</span>
+            </div>
+
+            <div class="chat-box" id="chat-box">
+              <div class="empty-state">Belum ada percakapan yang dipilih.</div>
+            </div>
+
+            <form id="manual-reply-form" class="chat-input-area">
+              <input type="text" id="manual-msg-input" placeholder="Ketik balasan manual ke WhatsApp pelanggan..." disabled>
+              <button type="submit" id="send-manual-btn" class="btn-primary" disabled>Kirim</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: KELOLA MENU & INFO KAFE -->
+      <section id="section-menu" class="content-section">
+        <div class="kb-header">
+          <div>
+            <h3>Kelola Info & Menu Malbourne</h3>
+            <p>Semua informasi di bawah ini otomatis dipelajari oleh AI untuk menjawab pelanggan.</p>
+          </div>
+        </div>
+
+        <!-- Form Tambah / Edit -->
+        <div class="kb-form-card">
+          <h4 id="kb-form-title">Tambah Informasi / Menu Baru</h4>
+          <form id="kb-form">
+            <input type="hidden" id="kb-id">
+            <div class="form-row">
+              <select id="kb-category" required>
+                <option value="menu">Menu & Harga</option>
+                <option value="info">Info Kafe (Jam Buka / Lokasi)</option>
+                <option value="promo">Promo & Event</option>
+                <option value="faq">Pertanyaan Umum (FAQ)</option>
+              </select>
+              <input type="text" id="kb-title" placeholder="Judul (Contoh: Kopi Susu Malbourne / Jam Buka)" required>
+            </div>
+            <textarea id="kb-content" rows="3" placeholder="Tulis detail lengkap di sini (Contoh: Kopi Susu Malbourne harga Rp 22.000, tersedia panas dan dingin...)" required></textarea>
+            <div class="form-actions">
+              <button type="submit" class="btn-primary" id="kb-submit-btn">Simpan Info</button>
+              <button type="button" class="btn-secondary hidden" id="kb-cancel-btn">Batal Edit</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tabel Daftar Info -->
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Kategori</th>
+                <th>Judul</th>
+                <th>Isi Informasi</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="knowledge-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

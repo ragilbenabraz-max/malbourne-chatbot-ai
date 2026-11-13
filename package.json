@@ -1,0 +1,16 @@
+{
+  "name": "malbourne-coffee-wa-bot",
+  "version": "1.0.0",
+  "description": "WhatsApp Customer Service AI Bot for Malbourne Coffee Co",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "axios": "^1.21.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "groq-sdk": "^0.8.0"
+  }
+}
