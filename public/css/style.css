@@ -1,99 +1,137 @@
 :root {
-  --primary: #4A3B32;
-  --primary-light: #6B5649;
-  --bg-color: #F6F4F0;
-  --white: #FFFFFF;
-  --border: #E2DDD5;
-  --text: #2C2623;
-  --success: #2E7D32;
-  --warning: #D84315;
+  --malbourne-brown: #5c4333;
+  --malbourne-light: #f5f1eb;
+  --wa-bg: #efeae2;
+  --msg-in-bg: #ffffff;
+  --msg-out-bg: #d9d0c7;
+  --border-color: #e0e0e0;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-body { background: var(--bg-color); color: var(--text); height: 100vh; }
-.hidden { display: none !important; }
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+body { background-color: #d1d7db; height: 100vh; display: flex; justify-content: center; align-items: center; }
 
-/* Login */
-.login-overlay { height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.login-card { background: var(--white); padding: 36px; border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); width: 100%; max-width: 380px; text-align: center; }
-.login-card h2 { color: var(--primary); margin-bottom: 6px; }
-.login-card p { color: #666; font-size: 0.9rem; margin-bottom: 20px; }
-.login-card input { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 8px; }
-.error-text { color: var(--warning); font-size: 0.85rem; margin-top: 10px; }
+/* Kontainer Utama - Mirip WA Web */
+.wa-container {
+  display: flex;
+  width: 100%;
+  max-width: 1600px;
+  height: 100vh;
+  background-color: #fff;
+  overflow: hidden;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+}
 
-/* Layout */
-.dashboard-container { display: flex; height: 100vh; }
-.sidebar { width: 240px; background: var(--white); border-right: 1px solid var(--border); padding: 24px 16px; display: flex; flex-direction: column; }
-.brand { margin-bottom: 28px; padding: 0 8px; }
-.brand h2 { color: var(--primary); font-size: 1.3rem; }
-.brand small { color: #777; }
-.nav-links { list-style: none; flex: 1; }
-.nav-links li { padding: 12px 14px; margin-bottom: 8px; border-radius: 8px; cursor: pointer; font-weight: 500; }
-.nav-links li:hover { background: var(--bg-color); }
-.nav-links li.active { background: var(--primary); color: var(--white); }
-.btn-logout { padding: 10px; background: transparent; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; color: #555; }
+/* --- PANEL KIRI --- */
+.left-panel {
+  width: 35%;
+  min-width: 320px;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+}
+.panel-header {
+  padding: 15px;
+  background-color: var(--malbourne-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+}
+.brand-info h2 { font-size: 1.2rem; color: var(--malbourne-brown); }
+.brand-info p { font-size: 0.8rem; color: #666; }
+.icon-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 5px; }
 
-.main-content { flex: 1; padding: 20px; overflow-y: auto; }
-.content-section { display: none; height: 100%; }
-.content-section.active { display: block; }
+.chat-list { flex: 1; overflow-y: auto; }
+.chat-item {
+  display: flex;
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.chat-item:hover { background-color: #f9f9f9; }
+.avatar { font-size: 2rem; margin-right: 15px; }
+.chat-item-details { flex: 1; overflow: hidden; }
+.chat-item-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
+.phone { font-weight: bold; }
+.badge { font-size: 0.7rem; padding: 3px 6px; border-radius: 4px; }
+.badge.danger { background: #fee2e2; color: #dc2626; }
+.badge.warning { background: #dcfce7; color: #16a34a; }
+.chat-item-last-msg { font-size: 0.85rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* Inbox Layout */
-.inbox-layout { display: flex; gap: 16px; height: calc(100vh - 40px); }
-.contact-list-panel { width: 300px; background: var(--white); border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
-.panel-header { padding: 16px; border-bottom: 1px solid var(--border); background: #FAF8F5; }
-.contact-list { flex: 1; overflow-y: auto; }
-.contact-item { padding: 14px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.15s; }
-.contact-item:hover, .contact-item.active { background: #F0EBE4; }
-.contact-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-.contact-phone { font-weight: 600; font-size: 0.95rem; }
-.badge-manual { background: #FBE9E7; color: var(--warning); font-size: 0.72rem; padding: 2px 8px; border-radius: 12px; font-weight: 700; }
-.badge-ai { background: #E8F5E9; color: var(--success); font-size: 0.72rem; padding: 2px 8px; border-radius: 12px; }
-.contact-preview { font-size: 0.82rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* --- PANEL KANAN --- */
+.right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--wa-bg);
+}
+.chat-header {
+  padding: 10px 15px;
+  background-color: var(--malbourne-light);
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+}
+.back-btn { display: none; font-size: 1.5rem; background: none; border: none; margin-right: 15px; cursor: pointer; }
+.chat-active-info { flex: 1; }
+.mode-btn { padding: 8px 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+.btn-danger { background-color: #d94220; color: white; }
 
-.chat-panel { flex: 1; background: var(--white); border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
-.chat-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-.status-sub { font-size: 0.82rem; color: #666; }
-.summary-banner { background: #FFF8E1; padding: 10px 20px; font-size: 0.85rem; border-bottom: 1px solid #FFE082; color: #5D4037; }
-.chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #FCFBF9; }
-.empty-state { text-align: center; color: #888; margin-top: 40px; font-size: 0.9rem; }
+.customer-summary {
+  background-color: #fef9c3;
+  padding: 10px 15px;
+  font-size: 0.85rem;
+  border-bottom: 1px solid #fde047;
+}
 
-.msg { max-width: 72%; padding: 11px 15px; border-radius: 12px; line-height: 1.45; font-size: 0.93rem; white-space: pre-wrap; }
-.msg-user { background: #ECE8E1; align-self: flex-start; border-bottom-left-radius: 2px; }
-.msg-bot { background: var(--primary); color: var(--white); align-self: flex-end; border-bottom-right-radius: 2px; }
+.chat-messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.message { max-width: 65%; display: flex; }
+.msg-content { padding: 8px 12px; border-radius: 8px; font-size: 0.95rem; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
+.msg-in { align-self: flex-start; }
+.msg-in .msg-content { background-color: var(--msg-in-bg); }
+.msg-out { align-self: flex-end; }
+.msg-out .msg-content { background-color: var(--msg-out-bg); }
 
-.chat-input-area { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; gap: 10px; background: var(--white); }
-.chat-input-area input { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 8px; outline: none; }
+.chat-footer {
+  padding: 15px;
+  background-color: var(--malbourne-light);
+  display: flex;
+  gap: 10px;
+}
+#chat-input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  outline: none;
+}
+.send-btn {
+  background-color: var(--malbourne-brown);
+  color: white;
+  border: none;
+  padding: 0 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
 
-/* Buttons */
-.btn { padding: 9px 16px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: var(--white); }
-.btn-active { background: var(--success); }
-.btn-paused { background: var(--warning); }
-.btn-primary { background: var(--primary); color: var(--white); border: none; padding: 11px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
-.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn-secondary { background: #DDD; color: #333; border: none; padding: 11px 16px; border-radius: 8px; cursor: pointer; }
-.full-width { width: 100%; }
-
-/* Knowledge Base */
-.kb-form-card { background: var(--white); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin: 16px 0; }
-.kb-form-card h4 { margin-bottom: 12px; color: var(--primary); }
-.form-row { display: flex; gap: 12px; margin-bottom: 12px; }
-.form-row select, .form-row input, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.92rem; }
-.form-row select { max-width: 220px; }
-.form-actions { display: flex; gap: 10px; margin-top: 12px; }
-
-.table-container { background: var(--white); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
-table { width: 100%; border-collapse: collapse; }
-th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-th { background: var(--primary); color: var(--white); }
-.btn-sm { padding: 5px 10px; font-size: 0.8rem; border-radius: 6px; border: none; cursor: pointer; margin-right: 4px; }
-.btn-edit { background: #E3F2FD; color: #1565C0; }
-.btn-del { background: #FFEBEE; color: #C62828; }
-
-@media (max-width: 768px) {
-  .dashboard-container, .inbox-layout { flex-direction: column; height: auto; }
-  .sidebar { width: 100%; }
-  .contact-list-panel { width: 100%; max-height: 220px; }
-  .chat-panel { height: 70vh; }
-  .form-row { flex-direction: column; }
-  .form-row select { max-width: 100%; }
+/* --- RESPONSIVITAS MOBILE (HP & TABLET PORTRAIT) --- */
+@media screen and (max-width: 768px) {
+  .wa-container { height: 100svh; } /* Hindari tertutup address bar mobile */
+  .left-panel { width: 100%; min-width: 100%; }
+  .right-panel { display: none; width: 100%; }
+  
+  /* Saat state chat terbuka di mobile */
+  .wa-container.chat-active .left-panel { display: none; }
+  .wa-container.chat-active .right-panel { display: flex; }
+  .back-btn { display: block; } /* Tampilkan tombol kembali */
 }

@@ -7,124 +7,80 @@
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-
-  <!-- LAYAR LOGIN -->
-  <div id="login-screen" class="login-overlay">
-    <div class="login-card">
-      <h2>Malbourne Coffee Co</h2>
-      <p>Masuk untuk mengelola chat & info kafe</p>
-      <form id="login-form">
-        <input type="text" id="login-user" placeholder="Username" required>
-        <input type="password" id="login-pass" placeholder="Password" required>
-        <button type="submit" class="btn-primary full-width">Masuk Dashboard</button>
-        <p id="login-error" class="error-text"></p>
-      </form>
-    </div>
-  </div>
-
-  <!-- DASHBOARD UTAMA -->
-  <div id="app-container" class="dashboard-container hidden">
-    <nav class="sidebar">
-      <div class="brand">
-        <h2>Malbourne Admin</h2>
-        <small>WhatsApp AI Assistant</small>
+  <div class="wa-container" id="app-container">
+    
+    <!-- PANEL KIRI: Menu & Daftar Pelanggan -->
+    <aside class="left-panel" id="left-panel">
+      <header class="panel-header">
+        <div class="brand-info">
+          <h2>Malbourne Admin</h2>
+          <p>WhatsApp AI Assistant</p>
+        </div>
+        <nav class="nav-actions">
+          <button class="icon-btn" title="Kelola Menu">📋</button>
+          <button class="icon-btn text-danger" title="Keluar">🚪</button>
+        </nav>
+      </header>
+      
+      <div class="chat-list" id="chat-list">
+        <!-- Contoh Item Daftar Chat -->
+        <div class="chat-item unread" onclick="openChat('+6281249565875')">
+          <div class="avatar">👤</div>
+          <div class="chat-item-details">
+            <div class="chat-item-header">
+              <span class="phone">+6281249565875</span>
+              <span class="badge danger">Butuh Admin</span>
+            </div>
+            <div class="chat-item-last-msg">[stiker]</div>
+          </div>
+        </div>
+        <div class="chat-item" onclick="openChat('+6285735828392')">
+          <div class="avatar">👤</div>
+          <div class="chat-item-details">
+            <div class="chat-item-header">
+              <span class="phone">+6285735828392</span>
+              <span class="badge warning">AI Aktif</span>
+            </div>
+            <div class="chat-item-last-msg">kenapa</div>
+          </div>
+        </div>
       </div>
-      <ul class="nav-links">
-        <li class="active" id="nav-inbox">💬 Kotak Masuk Chat</li>
-        <li id="nav-menu">📋 Kelola Menu & Info</li>
-      </ul>
-      <button id="logout-btn" class="btn-logout">Keluar</button>
-    </nav>
+    </aside>
 
-    <main class="main-content">
-      <!-- TAB 1: INBOX & BALAS MANUAL -->
-      <section id="section-inbox" class="content-section active">
-        <div class="inbox-layout">
-          <!-- Daftar Pelanggan -->
-          <div class="contact-list-panel">
-            <div class="panel-header">
-              <h4>Pelanggan Masuk</h4>
-            </div>
-            <div id="contact-list" class="contact-list">
-              <div class="empty-state">Memuat kontak...</div>
-            </div>
-          </div>
-
-          <!-- Ruang Obrolan -->
-          <div class="chat-panel">
-            <div class="chat-header">
-              <div>
-                <h3 id="active-phone-title">Pilih Pelanggan</h3>
-                <span id="ai-status-desc" class="status-sub">Klik nomor di kiri untuk melihat chat</span>
-              </div>
-              <button id="toggle-ai-btn" class="btn btn-active hidden">AI Aktif</button>
-            </div>
-
-            <div id="summary-banner" class="summary-banner hidden">
-              <strong>Ringkasan Pelanggan:</strong> <span id="summary-text">-</span>
-            </div>
-
-            <div class="chat-box" id="chat-box">
-              <div class="empty-state">Belum ada percakapan yang dipilih.</div>
-            </div>
-
-            <form id="manual-reply-form" class="chat-input-area">
-              <input type="text" id="manual-msg-input" placeholder="Ketik balasan manual ke WhatsApp pelanggan..." disabled>
-              <button type="submit" id="send-manual-btn" class="btn-primary" disabled>Kirim</button>
-            </form>
-          </div>
+    <!-- PANEL KANAN: Ruang Obrolan -->
+    <main class="right-panel" id="right-panel">
+      <!-- Header Ruang Chat -->
+      <header class="chat-header">
+        <button class="back-btn" id="back-btn" onclick="closeChat()">⬅</button>
+        <div class="chat-active-info">
+          <h3 id="active-phone">+6281249565875</h3>
+          <p>AI sedang diam. Silakan ketik balasan.</p>
         </div>
-      </section>
+        <button class="mode-btn btn-danger">Mode Balas Manual</button>
+      </header>
 
-      <!-- TAB 2: KELOLA MENU & INFO KAFE -->
-      <section id="section-menu" class="content-section">
-        <div class="kb-header">
-          <div>
-            <h3>Kelola Info & Menu Malbourne</h3>
-            <p>Semua informasi di bawah ini otomatis dipelajari oleh AI untuk menjawab pelanggan.</p>
-          </div>
-        </div>
+      <!-- Ringkasan Pelanggan -->
+      <div class="customer-summary">
+        <strong>Ringkasan Pelanggan:</strong> * Nama: Ragil * Minuman Favorit: Belum diketahui...
+      </div>
 
-        <!-- Form Tambah / Edit -->
-        <div class="kb-form-card">
-          <h4 id="kb-form-title">Tambah Informasi / Menu Baru</h4>
-          <form id="kb-form">
-            <input type="hidden" id="kb-id">
-            <div class="form-row">
-              <select id="kb-category" required>
-                <option value="menu">Menu & Harga</option>
-                <option value="info">Info Kafe (Jam Buka / Lokasi)</option>
-                <option value="promo">Promo & Event</option>
-                <option value="faq">Pertanyaan Umum (FAQ)</option>
-              </select>
-              <input type="text" id="kb-title" placeholder="Judul (Contoh: Kopi Susu Malbourne / Jam Buka)" required>
-            </div>
-            <textarea id="kb-content" rows="3" placeholder="Tulis detail lengkap di sini (Contoh: Kopi Susu Malbourne harga Rp 22.000, tersedia panas dan dingin...)" required></textarea>
-            <div class="form-actions">
-              <button type="submit" class="btn-primary" id="kb-submit-btn">Simpan Info</button>
-              <button type="button" class="btn-secondary hidden" id="kb-cancel-btn">Batal Edit</button>
-            </div>
-          </form>
+      <!-- Area Balon Chat -->
+      <div class="chat-messages" id="chat-messages">
+        <div class="message msg-in">
+          <div class="msg-content">halo, aku ragil, Malbourne buka jam</div>
         </div>
+        <div class="message msg-out">
+          <div class="msg-content">Halo, Ragil! Ada yang bisa saya bantu?</div>
+        </div>
+      </div>
 
-        <!-- Tabel Daftar Info -->
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Kategori</th>
-                <th>Judul</th>
-                <th>Isi Informasi</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody id="knowledge-tbody"></tbody>
-          </table>
-        </div>
-      </section>
+      <!-- Footer: Input Chat -->
+      <footer class="chat-footer">
+        <input type="text" placeholder="Ketik balasan manual ke WhatsApp pelanggan..." id="chat-input">
+        <button class="send-btn">Kirim</button>
+      </footer>
     </main>
-  </div>
 
-  <script src="/js/dashboard.js"></script>
+  </div>
 </body>
 </html>

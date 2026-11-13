@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let activePhone = null;
   let activeAiPaused = false;
 
+  // Elemen Utama
   const loginScreen = document.getElementById("login-screen");
   const appContainer = document.getElementById("app-container");
   const loginForm = document.getElementById("login-form");
@@ -16,200 +17,250 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function showDashboard() {
-    loginScreen.classList.add("hidden");
-    appContainer.classList.remove("hidden");
+    if(loginScreen) loginScreen.classList.add("hidden");
+    if(appContainer) appContainer.classList.remove("hidden");
     loadContacts();
   }
 
   if (authToken) showDashboard();
 
   // LOGIN & LOGOUT
-  loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const username = document.getElementById("login-user").value.trim();
-    const password = document.getElementById("login-pass").value.trim();
+  if(loginForm) {
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("login-user").value.trim();
+      const password = document.getElementById("login-pass").value.trim();
 
-    const res = await fetch("/api/dashboard/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password })
+      const res = await fetch("/api/dashboard/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+
+      if (res.ok && data.token) {
+        authToken = data.token;
+        localStorage.setItem("malbourne_token", authToken);
+        loginError.textContent = "";
+        showDashboard();
+      } else {
+        loginError.textContent = data.message || "Login gagal";
+      }
     });
-    const data = await res.json();
+  }
 
-    if (res.ok && data.token) {
-      authToken = data.token;
-      localStorage.setItem("malbourne_token", authToken);
-      loginError.textContent = "";
-      showDashboard();
-    } else {
-      loginError.textContent = data.message || "Login gagal";
-    }
-  });
+  const logoutBtn = document.getElementById("logout-btn");
+  if(logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("malbourne_token");
+      location.reload();
+    });
+  }
 
-  document.getElementById("logout-btn").addEventListener("click", () => {
-    localStorage.removeItem("malbourne_token");
-    location.reload();
-  });
-
-  // NAVIGASI TAB
+  // NAVIGASI TAB (INBOX & MENU)
   const navInbox = document.getElementById("nav-inbox");
   const navMenu = document.getElementById("nav-menu");
   const secInbox = document.getElementById("section-inbox");
   const secMenu = document.getElementById("section-menu");
 
-  navInbox.addEventListener("click", () => {
-    navInbox.classList.add("active");
-    navMenu.classList.remove("active");
-    secInbox.classList.add("active");
-    secMenu.classList.remove("active");
-    loadContacts();
-  });
+  if(navInbox && navMenu) {
+    navInbox.addEventListener("click", () => {
+      navInbox.classList.add("active");
+      navMenu.classList.remove("active");
+      secInbox.classList.add("active");
+      secMenu.classList.remove("active");
+      loadContacts();
+    });
 
-  navMenu.addEventListener("click", () => {
-    navMenu.classList.add("active");
-    navInbox.classList.remove("active");
-    secMenu.classList.add("active");
-    secInbox.classList.remove("active");
-    loadKnowledgeBase();
-  });
+    navMenu.addEventListener("click", () => {
+      navMenu.classList.add("active");
+      navInbox.classList.remove("active");
+      secMenu.classList.add("active");
+      secInbox.classList.remove("active");
+      loadKnowledgeBase();
+    });
+  }
+
+  // ==========================================
+  // LOGIKA CHAT & DAFTAR KONTAK (UI BARU)
+  // ==========================================
 
   // DAFTAR KONTAK PELANGGAN
   async function loadContacts() {
     try {
       const res = await fetch("/api/dashboard/contacts", { headers: authHeaders() });
-      if (res.status === 401) return document.getElementById("logout-btn").click();
+      if (res.status === 401 && logoutBtn) return logoutBtn.click();
       const result = await res.json();
-      const listEl = document.getElementById("contact-list");
+      const listEl = document.getElementById("chat-list"); // ID Baru untuk Layout WA
+
+      if (!listEl) return;
 
       if (!result.data || result.data.length === 0) {
-        listEl.innerHTML = '<div class="empty-state">Belum ada chat pelanggan masuk.</div>';
+        listEl.innerHTML = '<div style="padding:20px; text-align:center; color:#666;">Belum ada pesan.</div>';
         return;
       }
 
       listEl.innerHTML = "";
       result.data.forEach(c => {
         const div = document.createElement("div");
-        div.className = `contact-item ${activePhone === c.phone ? "active" : ""}`;
+        div.className = `chat-item ${activePhone === c.phone ? "active-chat" : ""}`;
+        div.onclick = () => selectCustomer(c.phone, c.isAiPaused);
+        
+        // Render UI Daftar Kontak ala WhatsApp
         div.innerHTML = `
-          <div class="contact-top">
-            <span class="contact-phone">+${c.phone}</span>
-            <span class="${c.isAiPaused ? "badge-manual" : "badge-ai"}">
-              ${c.isAiPaused ? "Butuh Admin" : "AI Aktif"}
-            </span>
+          <div class="avatar">👤</div>
+          <div class="chat-item-details">
+            <div class="chat-item-header">
+              <span class="phone">+${c.phone}</span>
+              <span class="badge ${c.isAiPaused ? "danger" : "warning"}">
+                ${c.isAiPaused ? "Butuh Admin" : "AI Aktif"}
+              </span>
+            </div>
+            <div class="chat-item-last-msg">${c.lastMessage}</div>
           </div>
-          <div class="contact-preview">${c.lastMessage}</div>
         `;
-        div.addEventListener("click", () => selectCustomer(c.phone, c.isAiPaused));
         listEl.appendChild(div);
       });
     } catch (err) {
-      console.error(err);
+      console.error("Gagal memuat kontak:", err);
     }
   }
 
-  // PILIH PELANGGAN & MUAT RIWAYAT CHAT
+  // PILIH PELANGGAN & BUKA DI HP (MOBILE SLIDE)
   async function selectCustomer(phone, isPaused) {
     activePhone = phone;
     activeAiPaused = isPaused;
-    document.getElementById("active-phone-title").textContent = `+${phone}`;
+    
+    document.getElementById("active-phone").textContent = `+${phone}`;
     updateAiButtonUI();
 
-    document.getElementById("manual-msg-input").disabled = false;
-    document.getElementById("send-manual-btn").disabled = false;
+    document.getElementById("chat-input").disabled = false;
+    const sendBtn = document.getElementById("send-manual-btn");
+    if(sendBtn) sendBtn.disabled = false;
+
+    // Logika buka panel kanan untuk layar HP
+    if(appContainer) appContainer.classList.add("chat-active");
 
     await refreshActiveChat();
-    loadContacts();
+    loadContacts(); // Refresh untuk highlight kontak yang aktif
   }
 
+  // TOMBOL KEMBALI DI HP (Tutup panel kanan)
+  const backBtn = document.getElementById("back-btn");
+  if(backBtn) {
+    backBtn.addEventListener("click", () => {
+      if(appContainer) appContainer.classList.remove("chat-active");
+    });
+  }
+
+  // MUAT RIWAYAT CHAT KE GELEMBUNG
   async function refreshActiveChat() {
     if (!activePhone) return;
     const res = await fetch(`/api/dashboard/chats/${activePhone}`, { headers: authHeaders() });
     const data = await res.json();
 
     const summaryBanner = document.getElementById("summary-banner");
-    if (data.summary) {
-      summaryBanner.classList.remove("hidden");
-      document.getElementById("summary-text").textContent = data.summary;
-    } else {
-      summaryBanner.classList.add("hidden");
+    const summaryText = document.getElementById("summary-text");
+    if (data.summary && summaryBanner && summaryText) {
+      summaryBanner.style.display = "block";
+      summaryText.textContent = data.summary;
+    } else if (summaryBanner) {
+      summaryBanner.style.display = "none";
     }
 
-    const chatBox = document.getElementById("chat-box");
-    chatBox.innerHTML = "";
+    const chatMessages = document.getElementById("chat-messages");
+    chatMessages.innerHTML = "";
+    
     (data.history || []).forEach(msg => {
       const div = document.createElement("div");
-      div.className = `msg ${msg.role === "user" ? "msg-user" : "msg-bot"}`;
-      div.textContent = msg.message;
-      chatBox.appendChild(div);
+      // Jika role user -> masuk (kiri, putih). Jika role assistant/admin -> keluar (kanan, hijau/coklat)
+      div.className = `message ${msg.role === "user" ? "msg-in" : "msg-out"}`;
+      div.innerHTML = `<div class="msg-content">${msg.message}</div>`;
+      chatMessages.appendChild(div);
     });
-    chatBox.scrollTop = chatBox.scrollHeight;
+    
+    // Auto-scroll ke pesan terbawah
+    chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
+  // TOMBOL TOGGLE MODE AI
   function updateAiButtonUI() {
     const btn = document.getElementById("toggle-ai-btn");
     const desc = document.getElementById("ai-status-desc");
-    btn.classList.remove("hidden");
+    if(!btn || !desc) return;
+
     if (activeAiPaused) {
-      btn.textContent = "Mode Balas Manual (AI Dijeda)";
-      btn.className = "btn btn-paused";
-      desc.textContent = "AI sedang diam. Silakan ketik balasan langsung di bawah.";
+      btn.textContent = "Mode Balas Manual";
+      btn.className = "mode-btn btn-danger";
+      desc.textContent = "AI sedang diam. Silakan ketik balasan.";
     } else {
-      btn.textContent = "AI Aktif (Auto-Reply)";
-      btn.className = "btn btn-active";
-      desc.textContent = "AI otomatis menjawab pertanyaan pelanggan.";
+      btn.textContent = "AI Aktif";
+      btn.className = "mode-btn btn-success"; // Pastikan btn-success ada di CSS (warna hijau)
+      desc.textContent = "AI otomatis menjawab pertanyaan.";
     }
   }
 
-  document.getElementById("toggle-ai-btn").addEventListener("click", async () => {
-    if (!activePhone) return;
-    activeAiPaused = !activeAiPaused;
-    await fetch("/api/dashboard/chats/toggle-ai", {
-      method: "POST",
-      headers: authHeaders(),
-      body: JSON.stringify({ phone: activePhone, isPaused: activeAiPaused })
-    });
-    updateAiButtonUI();
-    loadContacts();
-  });
-
-  // KIRIM BALASAN MANUAL KE WHATSAPP
-  document.getElementById("manual-reply-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const input = document.getElementById("manual-msg-input");
-    const text = input.value.trim();
-    if (!text || !activePhone) return;
-
-    input.value = "";
-    // Otomatis jeda AI saat admin membalas manual agar AI tidak menimpali
-    if (!activeAiPaused) {
-      activeAiPaused = true;
+  const toggleAiBtn = document.getElementById("toggle-ai-btn");
+  if(toggleAiBtn) {
+    toggleAiBtn.addEventListener("click", async () => {
+      if (!activePhone) return;
+      activeAiPaused = !activeAiPaused;
       await fetch("/api/dashboard/chats/toggle-ai", {
         method: "POST",
         headers: authHeaders(),
-        body: JSON.stringify({ phone: activePhone, isPaused: true })
+        body: JSON.stringify({ phone: activePhone, isPaused: activeAiPaused })
       });
       updateAiButtonUI();
-    }
-
-    await fetch("/api/dashboard/chats/send", {
-      method: "POST",
-      headers: authHeaders(),
-      body: JSON.stringify({ phone: activePhone, message: text })
+      loadContacts();
     });
+  }
 
-    await refreshActiveChat();
-    loadContacts();
-  });
+  // KIRIM PESAN MANUAL KE PELANGGAN
+  const manualReplyForm = document.getElementById("manual-reply-form");
+  if(manualReplyForm) {
+    manualReplyForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const input = document.getElementById("chat-input");
+      const text = input.value.trim();
+      if (!text || !activePhone) return;
 
-  // KELOLA KNOWLEDGE BASE (TAMBAH / EDIT / HAPUS)
+      input.value = "";
+      
+      // Otomatis jeda AI saat admin membalas manual
+      if (!activeAiPaused) {
+        activeAiPaused = true;
+        await fetch("/api/dashboard/chats/toggle-ai", {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({ phone: activePhone, isPaused: true })
+        });
+        updateAiButtonUI();
+      }
+
+      await fetch("/api/dashboard/chats/send", {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ phone: activePhone, message: text })
+      });
+
+      await refreshActiveChat();
+      loadContacts();
+    });
+  }
+
+  // ==========================================
+  // KELOLA KNOWLEDGE BASE (TETAP SAMA)
+  // ==========================================
   const kbForm = document.getElementById("kb-form");
   const kbIdInput = document.getElementById("kb-id");
   const kbCancelBtn = document.getElementById("kb-cancel-btn");
 
   async function loadKnowledgeBase() {
+    const tbody = document.getElementById("knowledge-tbody");
+    if(!tbody) return;
+
     const res = await fetch("/api/dashboard/knowledge", { headers: authHeaders() });
     const result = await res.json();
-    const tbody = document.getElementById("knowledge-tbody");
     tbody.innerHTML = "";
 
     (result.data || []).forEach(item => {
@@ -241,8 +292,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  kbCancelBtn.addEventListener("click", resetKbForm);
+  if(kbCancelBtn) {
+    kbCancelBtn.addEventListener("click", resetKbForm);
+  }
   function resetKbForm() {
+    if(!kbForm) return;
     kbIdInput.value = "";
     kbForm.reset();
     document.getElementById("kb-form-title").textContent = "Tambah Informasi / Menu Baru";
@@ -250,26 +304,29 @@ document.addEventListener("DOMContentLoaded", () => {
     kbCancelBtn.classList.add("hidden");
   }
 
-  kbForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const id = kbIdInput.value;
-    const payload = {
-      category: document.getElementById("kb-category").value,
-      title: document.getElementById("kb-title").value.trim(),
-      content: document.getElementById("kb-content").value.trim()
-    };
+  if(kbForm) {
+    kbForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const id = kbIdInput.value;
+      const payload = {
+        category: document.getElementById("kb-category").value,
+        title: document.getElementById("kb-title").value.trim(),
+        content: document.getElementById("kb-content").value.trim()
+      };
 
-    const url = id ? `/api/dashboard/knowledge/${id}` : "/api/dashboard/knowledge";
-    const method = id ? "PUT" : "POST";
+      const url = id ? `/api/dashboard/knowledge/${id}` : "/api/dashboard/knowledge";
+      const method = id ? "PUT" : "POST";
 
-    await fetch(url, { method, headers: authHeaders(), body: JSON.stringify(payload) });
-    resetKbForm();
-    loadKnowledgeBase();
-  });
+      await fetch(url, { method, headers: authHeaders(), body: JSON.stringify(payload) });
+      resetKbForm();
+      loadKnowledgeBase();
+    });
+  }
 
-  // Auto-refresh kontak & chat setiap 5 detik
+  // AUTO-REFRESH (Setiap 5 detik untuk chat baru)
   setInterval(() => {
-    if (authToken && secInbox.classList.contains("active")) {
+    // Refresh jika sudah login dan tidak berada di tab knowledge base
+    if (authToken && secInbox && secInbox.classList.contains("active")) {
       loadContacts();
       if (activePhone) refreshActiveChat();
     }
