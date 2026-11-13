@@ -5,8 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Malbourne Coffee Co - Admin Dashboard</title>
   <link rel="stylesheet" href="/css/style.css">
+  
+  <!-- FontAwesome untuk Icon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+
+  <!-- KOTAK LOGIN -->
+  <div id="login-screen" class="login-container hidden">
+    <form id="login-form">
+      <h2>Login Admin</h2>
+      <input type="text" id="login-user" placeholder="Username" required>
+      <input type="password" id="login-pass" placeholder="Password" required>
+      <button type="submit">Masuk</button>
+      <p id="login-error" style="color:red;"></p>
+    </form>
+  </div>
+
+  <!-- APLIKASI UTAMA (WA WEB STYLE) -->
   <div class="wa-container" id="app-container">
     
     <!-- PANEL KIRI: Menu & Daftar Pelanggan -->
@@ -17,70 +33,104 @@
           <p>WhatsApp AI Assistant</p>
         </div>
         <nav class="nav-actions">
-          <button class="icon-btn" title="Kelola Menu">📋</button>
-          <button class="icon-btn text-danger" title="Keluar">🚪</button>
+          <!-- Menu Navigasi dengan FontAwesome -->
+          <button id="nav-inbox" class="icon-btn active" title="Kotak Masuk Chat">
+            <i class="fas fa-comments"></i>
+          </button>
+          <button id="nav-menu" class="icon-btn" title="Kelola Info (Ngajarin AI)">
+            <i class="fas fa-clipboard-list"></i>
+          </button>
+          <button id="logout-btn" class="icon-btn text-danger" title="Keluar">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
         </nav>
       </header>
       
+      <!-- Area Daftar Chat -->
       <div class="chat-list" id="chat-list">
-        <!-- Contoh Item Daftar Chat -->
-        <div class="chat-item unread" onclick="openChat('+6281249565875')">
-          <div class="avatar">👤</div>
-          <div class="chat-item-details">
-            <div class="chat-item-header">
-              <span class="phone">+6281249565875</span>
-              <span class="badge danger">Butuh Admin</span>
-            </div>
-            <div class="chat-item-last-msg">[stiker]</div>
-          </div>
-        </div>
-        <div class="chat-item" onclick="openChat('+6285735828392')">
-          <div class="avatar">👤</div>
-          <div class="chat-item-details">
-            <div class="chat-item-header">
-              <span class="phone">+6285735828392</span>
-              <span class="badge warning">AI Aktif</span>
-            </div>
-            <div class="chat-item-last-msg">kenapa</div>
-          </div>
-        </div>
+        <!-- Diisi otomatis oleh JavaScript -->
       </div>
     </aside>
 
-    <!-- PANEL KANAN: Ruang Obrolan -->
+    <!-- PANEL KANAN: Ruang Obrolan & Ngajarin AI -->
     <main class="right-panel" id="right-panel">
-      <!-- Header Ruang Chat -->
-      <header class="chat-header">
-        <button class="back-btn" id="back-btn" onclick="closeChat()">⬅</button>
-        <div class="chat-active-info">
-          <h3 id="active-phone">+6281249565875</h3>
-          <p>AI sedang diam. Silakan ketik balasan.</p>
-        </div>
-        <button class="mode-btn btn-danger">Mode Balas Manual</button>
-      </header>
+      
+      <!-- HALAMAN 1: RUANG CHAT (Aktif secara default) -->
+      <div id="section-inbox" class="section-content" style="display: flex; flex-direction: column; height: 100%;">
+        <header class="chat-header">
+          <button class="back-btn" id="back-btn" onclick="closeChat()">⬅</button>
+          <div class="chat-active-info">
+            <h3 id="active-phone">Pilih pelanggan di samping</h3>
+            <p id="ai-status-desc">AI sedang diam.</p>
+          </div>
+          <button id="toggle-ai-btn" class="mode-btn btn-danger">Mode Balas Manual</button>
+        </header>
 
-      <!-- Ringkasan Pelanggan -->
-      <div class="customer-summary">
-        <strong>Ringkasan Pelanggan:</strong> * Nama: Ragil * Minuman Favorit: Belum diketahui...
+        <div id="summary-banner" class="customer-summary" style="display: none;">
+          <strong>Ringkasan Pelanggan:</strong> <span id="summary-text"></span>
+        </div>
+
+        <div class="chat-messages" id="chat-messages">
+          <!-- Chat Bubbles diisi otomatis oleh JS -->
+        </div>
+
+        <form class="chat-footer" id="manual-reply-form">
+          <input type="text" placeholder="Ketik balasan manual ke WhatsApp..." id="chat-input">
+          <button type="submit" class="send-btn" id="send-manual-btn">Kirim</button>
+        </form>
       </div>
 
-      <!-- Area Balon Chat -->
-      <div class="chat-messages" id="chat-messages">
-        <div class="message msg-in">
-          <div class="msg-content">halo, aku ragil, Malbourne buka jam</div>
-        </div>
-        <div class="message msg-out">
-          <div class="msg-content">Halo, Ragil! Ada yang bisa saya bantu?</div>
-        </div>
+      <!-- HALAMAN 2: NGAJARIN AI (Disembunyikan secara default) -->
+      <div id="section-menu" class="section-content" style="display: none; padding: 30px; overflow-y: auto; background: white; height: 100%;">
+        <h2 style="color: var(--malbourne-brown); margin-bottom: 10px;">Ngajarin AI (Knowledge Base)</h2>
+        <p style="color: #666; margin-bottom: 20px;">Tambahkan detail menu, harga, dan info kafe agar AI bisa menjawab dengan akurat.</p>
+        
+        <form id="kb-form" style="background: #fdfdfd; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px;">
+          <h3 id="kb-form-title" style="margin-bottom: 15px;">Tambah Info Baru</h3>
+          <input type="hidden" id="kb-id">
+          
+          <div style="margin-bottom: 15px;">
+            <label style="font-weight: bold;">Kategori:</label><br>
+            <select id="kb-category" style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px;">
+              <option value="menu">Menu & Harga</option>
+              <option value="info">Info Umum (Jam, Lokasi, Fasilitas)</option>
+              <option value="promo">Promo & Diskon</option>
+            </select>
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+            <label style="font-weight: bold;">Judul Topik (misal: Harga Kopi Susu):</label><br>
+            <input type="text" id="kb-title" style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px;" required>
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+            <label style="font-weight: bold;">Isi Penjelasan untuk AI:</label><br>
+            <textarea id="kb-content" rows="4" style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px;" placeholder="Tuliskan secara jelas, misal: Kopi Susu Aren harganya Rp 25.000, tersedia ukuran reguler dan large." required></textarea>
+          </div>
+          
+          <button type="submit" id="kb-submit-btn" style="padding: 10px 20px; background: #5c4333; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Simpan Info</button>
+          <button type="button" id="kb-cancel-btn" class="hidden" style="padding: 10px 20px; background: #ccc; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">Batal</button>
+        </form>
+
+        <h3 style="margin-bottom: 10px;">Database Pengetahuan AI</h3>
+        <table style="width: 100%; border-collapse: collapse; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <thead>
+            <tr style="background: #f5f1eb; text-align: left;">
+              <th style="padding: 12px; border: 1px solid #ddd;">Kategori</th>
+              <th style="padding: 12px; border: 1px solid #ddd;">Judul</th>
+              <th style="padding: 12px; border: 1px solid #ddd;">Isi</th>
+              <th style="padding: 12px; border: 1px solid #ddd;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="knowledge-tbody">
+            <!-- Diisi otomatis oleh JS -->
+          </tbody>
+        </table>
       </div>
 
-      <!-- Footer: Input Chat -->
-      <footer class="chat-footer">
-        <input type="text" placeholder="Ketik balasan manual ke WhatsApp pelanggan..." id="chat-input">
-        <button class="send-btn">Kirim</button>
-      </footer>
     </main>
-
   </div>
+
+  <script src="/js/dashboard.js"></script>
 </body>
 </html>

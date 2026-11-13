@@ -67,16 +67,22 @@ document.addEventListener("DOMContentLoaded", () => {
     navInbox.addEventListener("click", () => {
       navInbox.classList.add("active");
       navMenu.classList.remove("active");
-      secInbox.classList.add("active");
-      secMenu.classList.remove("active");
+      
+      // Tampilkan Inbox, sembunyikan Menu
+      secInbox.style.display = "flex";
+      secMenu.style.display = "none";
+      
       loadContacts();
     });
 
     navMenu.addEventListener("click", () => {
       navMenu.classList.add("active");
       navInbox.classList.remove("active");
-      secMenu.classList.add("active");
-      secInbox.classList.remove("active");
+      
+      // Tampilkan Menu, sembunyikan Inbox
+      secMenu.style.display = "block";
+      secInbox.style.display = "none";
+      
       loadKnowledgeBase();
     });
   }
