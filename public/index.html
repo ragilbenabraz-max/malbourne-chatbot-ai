@@ -2,7 +2,8 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#008069">
   <title>Malbourne Coffee Co - Admin Dashboard</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
@@ -11,11 +12,14 @@
   <!-- LAYAR LOGIN -->
   <div id="login-screen" class="login-overlay">
     <div class="login-card">
+      <div class="login-logo">
+        <svg viewBox="0 0 24 24" width="34" height="34" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+      </div>
       <h2>Malbourne Coffee Co</h2>
       <p>Masuk untuk mengelola chat & info kafe</p>
       <form id="login-form">
-        <input type="text" id="login-user" placeholder="Username" required>
-        <input type="password" id="login-pass" placeholder="Password" required>
+        <input type="text" id="login-user" placeholder="Username" required autocomplete="username">
+        <input type="password" id="login-pass" placeholder="Password" required autocomplete="current-password">
         <button type="submit" class="btn-primary full-width">Masuk Dashboard</button>
         <p id="login-error" class="error-text"></p>
       </form>
@@ -25,15 +29,20 @@
   <!-- DASHBOARD UTAMA -->
   <div id="app-container" class="dashboard-container hidden">
     <nav class="sidebar">
-      <div class="brand">
-        <h2>Malbourne Admin</h2>
-        <small>WhatsApp AI Assistant</small>
-      </div>
       <ul class="nav-links">
-        <li class="active" id="nav-inbox">💬 Kotak Masuk Chat</li>
-        <li id="nav-menu">📋 Kelola Menu & Info</li>
+        <li class="active" id="nav-inbox">
+          <span class="nav-ico"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></span>
+          <span class="nav-label">Chat</span>
+        </li>
+        <li id="nav-menu">
+          <span class="nav-ico"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 9V7c0-1.1-.9-2-2-2h-3c0-1.66-1.34-3-3-3S9 3.34 9 5H6c-1.1 0-2 .9-2 2v2c-1.66 0-3 1.34-3 3s1.34 3 3 3v4c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-4c1.66 0 3-1.34 3-3s-1.34-3-3-3zM7.5 11.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5S9.83 13 9 13s-1.5-.67-1.5-1.5zM16 17H8v-2h8v2zm-1-4c-.83 0-1.5-.67-1.5-1.5S14.17 10 15 10s1.5.67 1.5 1.5S15.83 13 15 13z"/></svg></span>
+          <span class="nav-label">Latih AI</span>
+        </li>
       </ul>
-      <button id="logout-btn" class="btn-logout">Keluar</button>
+      <button id="logout-btn" class="btn-logout">
+        <span class="nav-ico"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg></span>
+        <span class="nav-label">Keluar</span>
+      </button>
     </nav>
 
     <main class="main-content">
@@ -43,7 +52,8 @@
           <!-- Daftar Pelanggan -->
           <div class="contact-list-panel">
             <div class="panel-header">
-              <h4>Pelanggan Masuk</h4>
+              <h4>Malbourne Coffee Co</h4>
+              <small>Pelanggan masuk · WhatsApp AI Assistant</small>
             </div>
             <div id="contact-list" class="contact-list">
               <div class="empty-state">Memuat kontak...</div>
@@ -53,9 +63,15 @@
           <!-- Ruang Obrolan -->
           <div class="chat-panel">
             <div class="chat-header">
-              <div>
-                <h3 id="active-phone-title">Pilih Pelanggan</h3>
-                <span id="ai-status-desc" class="status-sub">Klik nomor di kiri untuk melihat chat</span>
+              <div class="chat-head-left">
+                <button type="button" id="chat-back-btn" class="back-btn" aria-label="Kembali">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                <div class="chat-avatar"></div>
+                <div class="chat-head-text">
+                  <h3 id="active-phone-title">Pilih Pelanggan</h3>
+                  <span id="ai-status-desc" class="status-sub">Klik nomor di kiri untuk melihat chat</span>
+                </div>
               </div>
               <button id="toggle-ai-btn" class="btn btn-active hidden">AI Aktif</button>
             </div>
@@ -69,8 +85,10 @@
             </div>
 
             <form id="manual-reply-form" class="chat-input-area">
-              <input type="text" id="manual-msg-input" placeholder="Ketik balasan manual ke WhatsApp pelanggan..." disabled>
-              <button type="submit" id="send-manual-btn" class="btn-primary" disabled>Kirim</button>
+              <input type="text" id="manual-msg-input" placeholder="Ketik balasan manual ke WhatsApp pelanggan..." disabled autocomplete="off">
+              <button type="submit" id="send-manual-btn" class="btn-primary" disabled aria-label="Kirim">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
             </form>
           </div>
         </div>
@@ -80,7 +98,7 @@
       <section id="section-menu" class="content-section">
         <div class="kb-header">
           <div>
-            <h3>Kelola Info & Menu Malbourne</h3>
+            <h3>Latih AI Malbourne</h3>
             <p>Semua informasi di bawah ini otomatis dipelajari oleh AI untuk menjawab pelanggan.</p>
           </div>
         </div>
@@ -126,5 +144,18 @@
   </div>
 
   <script src="/js/dashboard.js"></script>
+  <!-- Khusus tampilan mobile: buka/tutup layar chat (tidak mengubah logika dashboard.js) -->
+  <script>
+    (function () {
+      var list = document.getElementById("contact-list");
+      var back = document.getElementById("chat-back-btn");
+      list.addEventListener("click", function (e) {
+        if (e.target.closest(".contact-item")) document.body.classList.add("chat-open");
+      });
+      back.addEventListener("click", function () {
+        document.body.classList.remove("chat-open");
+      });
+    })();
+  </script>
 </body>
 </html>
