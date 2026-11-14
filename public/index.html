@@ -145,15 +145,36 @@
 
   <script src="/js/dashboard.js"></script>
   <!-- Khusus tampilan mobile: buka/tutup layar chat (tidak mengubah logika dashboard.js) -->
+  <!-- Khusus tampilan mobile: buka/tutup layar chat & fungsi tombol Back HP -->
   <script>
     (function () {
       var list = document.getElementById("contact-list");
       var back = document.getElementById("chat-back-btn");
+
+      // 1. Catat posisi awal saat pertama kali buka web agar tombol back tidak langsung keluar
+      if (!history.state) {
+        history.replaceState({ view: "home" }, "", window.location.pathname);
+      }
+
+      // 2. Saat kontak diklik: Buka layar chat DAN catat riwayat baru ke HP (#chat)
       list.addEventListener("click", function (e) {
-        if (e.target.closest(".contact-item")) document.body.classList.add("chat-open");
+        if (e.target.closest(".contact-item")) {
+          document.body.classList.add("chat-open");
+          history.pushState({ view: "chat" }, "", "#chat");
+        }
       });
+
+      // 3. Saat tombol panah kembali (di web) diklik: mundur 1 langkah di riwayat HP
       back.addEventListener("click", function () {
-        document.body.classList.remove("chat-open");
+        history.back(); // Ini akan memicu event 'popstate' di bawah secara otomatis
+      });
+
+      // 4. Saat tombol BACK FISIK HP ditekan (atau history.back terpanggil)
+      window.addEventListener("popstate", function (event) {
+        // Jika kita kembali ke riwayat 'home' (atau riwayat kosong), tutup layar chat
+        if (!event.state || event.state.view !== "chat") {
+          document.body.classList.remove("chat-open");
+        }
       });
     })();
   </script>
